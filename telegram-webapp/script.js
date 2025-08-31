@@ -1,4 +1,5 @@
 /***** 1) НАСТРОЙКИ *****/
+// наши прокси-роуты на Vercel
 const API_GET = '/api/sheets-get';
 const API_POST = '/api/sheets-post';
 
