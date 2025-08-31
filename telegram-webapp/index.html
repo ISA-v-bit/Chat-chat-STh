@@ -2,11 +2,14 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <title>Запись</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
- <script src="script.js?v=9"></script>
+  <title>Запись</title>
+
+  <!-- 1) Сначала CDN Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- 2) Потом config (иначе "tailwind is not defined") -->
   <script>
-    /* Брендовые цвета из логотипа */
     tailwind.config = {
       theme: {
         extend: {
@@ -85,6 +88,6 @@
     </form>
   </div>
 
-  <script src="script.js"></script>
+  <script src="script.js?v=11" defer></script>
 </body>
 </html>
