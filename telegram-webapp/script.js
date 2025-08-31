@@ -1,8 +1,10 @@
 /***** 1) НАСТРОЙКИ *****/
+console.log('webapp build v9');
 // наши прокси-роуты на Vercel
 const API_GET = '/api/sheets-get';
 const API_POST = '/api/sheets-post';
 
+/***** 2) API *****/
 async function fetchSlotsForMonth(year, month0) {
   const month = `${year}-${String(month0+1).padStart(2,'0')}`;
   const res = await fetch(`${API_GET}?month=${month}`);
