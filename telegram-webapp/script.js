@@ -24,7 +24,7 @@ async function bookSelected(detail, name, phone) {
   if (!json.ok) throw new Error(json.error || 'book error');
   return json;
 }
-/***** 2) ЭЛЕМЕНТЫ UI *****/
+/***** 3) ЭЛЕМЕНТЫ UI *****/
 const monthLabel = document.getElementById('monthLabel');
 const calendarGrid = document.getElementById('calendarGrid');
 const timesGrid = document.getElementById('times');
@@ -32,19 +32,19 @@ const selectedDateLabel = document.getElementById('selectedDateLabel');
 const form = document.getElementById('form');
 const submitBtn = form.querySelector('button[type="submit"]');
 
-/***** 3) СОСТОЯНИЕ *****/
+/***** 4) СОСТОЯНИЕ *****/
 let viewYear, viewMonth;               // отображаемый месяц (0..11)
 let selectedDate = null;               // 'YYYY-MM-DD'
 let selectedTime = null;               // 'HH:MM'
 window.SLOTS_BY_DATE = {};             // { 'YYYY-MM-DD': ['HH:MM', ...] }
 window.SLOT_DETAILS = {};              // { date: { time: { rowIndex, start, end } } }
 
-/***** 4) УТИЛИТЫ *****/
+/***** 5) УТИЛИТЫ *****/
 function pad(n){ return n < 10 ? '0' + n : '' + n; }
 function toISO(y,m,d){ return `${y}-${pad(m+1)}-${pad(d)}`; } // m: 0..11
 const monthNames = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
 
-/***** 5) API: ЗАГРУЗКА СЛОТОВ И БРОНЬ *****/
+/***** 6) API: ЗАГРУЗКА СЛОТОВ И БРОНЬ *****/
 async function fetchSlotsForMonth(year, month0) {
   const month = `${year}-${pad(month0+1)}`; // YYYY-MM
   const resp = await fetch(`${API_BASE}?month=${month}`);
@@ -65,7 +65,7 @@ async function bookSelected(detail, name, phone) {
   return json;
 }
 
-/***** 6) РЕНДЕР КАЛЕНДАРЯ *****/
+/***** 7) РЕНДЕР КАЛЕНДАРЯ *****/
 function renderCalendar(){
   monthLabel.textContent = `${monthNames[viewMonth]} ${viewYear}`;
 
@@ -117,7 +117,7 @@ function renderCalendar(){
   }
 }
 
-/***** 7) РЕНДЕР ВРЕМЕНИ (3 в ряд) *****/
+/***** 8) РЕНДЕР ВРЕМЕНИ (3 в ряд) *****/
 function renderTimes(){
   timesGrid.innerHTML = '';
   selectedDateLabel.classList.add('hidden');
@@ -165,14 +165,14 @@ function renderTimes(){
   });
 }
 
-/***** 8) СИНХРОНИЗАЦИЯ ФОРМЫ *****/
+/***** 9) СИНХРОНИЗАЦИЯ ФОРМЫ *****/
 function syncFormState(){
   form.date.value = selectedDate || '';
   form.time.value = selectedTime || '';
   submitBtn.disabled = !(selectedDate && selectedTime);
 }
 
-/***** 9) НАВИГАЦИЯ ПО МЕСЯЦАМ С ЗАГРУЗКОЙ ИЗ API *****/
+/***** 10) НАВИГАЦИЯ ПО МЕСЯЦАМ С ЗАГРУЗКОЙ ИЗ API *****/
 async function loadAndRenderMonth() {
   // можно повесить лоадер
   calendarGrid.innerHTML = `<div class="col-span-7 text-center text-sm text-brandDark/60 py-2">Загрузка…</div>`;
@@ -203,7 +203,7 @@ document.getElementById('nextMonth').onclick = async () => {
   await loadAndRenderMonth();
 };
 
-/***** 10) САБМИТ ФОРМЫ (БРОНЬ) *****/
+/***** 11) САБМИТ ФОРМЫ (БРОНЬ) *****/
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
   if (!selectedDate || !selectedTime) return;
@@ -235,7 +235,7 @@ form.addEventListener('submit', async (e) => {
   }
 });
 
-/***** 11) СТАРТ *****/
+/***** 12) СТАРТ *****/
 (function init(){
   const now = new Date();
   viewYear = now.getFullYear();
