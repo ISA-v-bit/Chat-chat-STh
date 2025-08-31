@@ -1,6 +1,26 @@
 /***** 1) НАСТРОЙКИ *****/
-const API_BASE = 'https://script.google.com/macros/s/AKfycbwcbKRn6vOiz_vCmQ4z23fTswKfNtpri27OLZut-3QV8_SiDFjnn3wuq0Z7HJGceibx0A/exec'; // <- ТВОЙ /exec
+const API_GET = '/api/sheets-get';
+const API_POST = '/api/sheets-post';
 
+async function fetchSlotsForMonth(year, month0) {
+  const month = `${year}-${String(month0+1).padStart(2,'0')}`;
+  const res = await fetch(`${API_GET}?month=${month}`);
+  const json = await res.json();
+  if (!json.ok) throw new Error(json.error || 'slots fetch error');
+  window.SLOTS_BY_DATE = json.slots || {};
+  window.SLOT_DETAILS  = json.detailed || {};
+}
+
+async function bookSelected(detail, name, phone) {
+  const res = await fetch(API_POST, {
+    method: 'POST',
+    headers: { 'Content-Type':'application/json' },
+    body: JSON.stringify({ rowIndex: detail.rowIndex, name, phone })
+  });
+  const json = await res.json();
+  if (!json.ok) throw new Error(json.error || 'book error');
+  return json;
+}
 /***** 2) ЭЛЕМЕНТЫ UI *****/
 const monthLabel = document.getElementById('monthLabel');
 const calendarGrid = document.getElementById('calendarGrid');
