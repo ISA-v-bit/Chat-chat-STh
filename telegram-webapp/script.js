@@ -48,8 +48,8 @@ const monthNames = ['Январь','Февраль','Март','Апрель','�
 
 /***** 6) API: ЗАГРУЗКА СЛОТОВ И БРОНЬ *****/
 async function fetchSlotsForMonth(year, month0) {
-  const month = `${year}-${pad(month0+1)}`; // YYYY-MM
-  const resp = await fetch(`${API_BASE}?month=${month}`);
+  const month = `${year}-${String(month0+1).padStart(2,'0')}`;
+  const resp = await fetch(`/api/sheets-get?month=${month}`);
   const json = await resp.json();
   if (!json.ok) throw new Error(json.error || 'slots fetch error');
   window.SLOTS_BY_DATE = json.slots || {};
@@ -57,16 +57,15 @@ async function fetchSlotsForMonth(year, month0) {
 }
 
 async function bookSelected(detail, name, phone) {
-  const resp = await fetch(API_BASE, {
+  const resp = await fetch('/api/sheets-post', {
     method: 'POST',
-    headers: {'Content-Type':'application/json'},
+    headers: { 'Content-Type':'application/json' },
     body: JSON.stringify({ rowIndex: detail.rowIndex, name, phone })
   });
   const json = await resp.json();
   if (!json.ok) throw new Error(json.error || 'book error');
   return json;
 }
-
 /***** 7) РЕНДЕР КАЛЕНДАРЯ *****/
 function renderCalendar(){
   monthLabel.textContent = `${monthNames[viewMonth]} ${viewYear}`;
