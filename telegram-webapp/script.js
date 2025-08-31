@@ -1,5 +1,5 @@
 /***** 1) НАСТРОЙКИ *****/
-const API_BASE = 'https://script.google.com/macros/s/AKfycbxI5Hd2rE8CFvqLioYtugcvT9HKFcgzBVYLjuAnCGNp2dWiu479YUl6_3vIJUcwV8pE/exec'; // <- ТВОЙ /exec
+const API_BASE = 'https://script.google.com/macros/s/AKfycbwcbKRn6vOiz_vCmQ4z23fTswKfNtpri27OLZut-3QV8_SiDFjnn3wuq0Z7HJGceibx0A/exec'; // <- ТВОЙ /exec
 
 /***** 2) ЭЛЕМЕНТЫ UI *****/
 const monthLabel = document.getElementById('monthLabel');
