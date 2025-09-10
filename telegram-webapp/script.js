@@ -46,6 +46,27 @@ function pad(n){ return n < 10 ? '0' + n : '' + n; }
 function toISO(y,m,d){ return `${y}-${pad(m+1)}-${pad(d)}`; } // m: 0..11
 const monthNames = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
 
+/***** 5a) ХЕЛПЕРЫ ДЛЯ КАЛЕНДАРЯ *****/
+function addMinutesToHHMM(hhmm, mins) {
+  const [h, m] = hhmm.split(':').map(Number);
+  const total = h * 60 + m + mins;
+  const nh = Math.floor(total / 60) % 24;
+  const nm = total % 60;
+  return `${String(nh).padStart(2,'0')}:${String(nm).padStart(2,'0')}`;
+}
+
+function toGCalUTC(dateISO, hhmm) {
+  const [y, mo, d] = dateISO.split('-').map(Number);
+  const [hh, mm] = hhmm.split(':').map(Number);
+  const local = new Date(y, mo - 1, d, hh, mm, 0);
+  const Y = local.getUTCFullYear();
+  const M = String(local.getUTCMonth() + 1).padStart(2, '0');
+  const D = String(local.getUTCDate()).padStart(2, '0');
+  const H = String(local.getUTCHours()).padStart(2, '0');
+  const Min = String(local.getUTCMinutes()).padStart(2, '0');
+  return `${Y}${M}${D}T${H}${Min}00Z`;
+}
+
 /***** 6) API: ЗАГРУЗКА СЛОТОВ И БРОНЬ *****/
 async function fetchSlotsForMonth(year, month0) {
   const month = `${year}-${String(month0+1).padStart(2,'0')}`;
@@ -222,27 +243,29 @@ form.addEventListener('submit', async (e) => {
   try {
     await bookSelected(detail, fd.get('name'), fd.get('phone'));
 
-// генерируем дату/время для Google Calendar
-const date = new Date(`${detail.date}T${detail.start}`);  // detail.start = "HH:MM"
-const end = new Date(`${detail.date}T${detail.end}`);     // detail.end = "HH:MM"
+// берём дату/время из выбранного состояния
+const dateISO = selectedDate;              // 'YYYY-MM-DD'
+const startHHMM = selectedTime;            // 'HH:MM'
+const endHHMM = (window.SLOT_DETAILS?.[dateISO]?.[startHHMM]?.end)
+  || addMinutesToHHMM(startHHMM, 30);      // fallback: +30 минут, если в таблице нет end
 
-// преобразуем в формат YYYYMMDDTHHmmssZ (UTC)
-function toCalFormat(d) {
-  return d.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
-}
-const startStr = toCalFormat(date);
-const endStr = toCalFormat(end);
+// формируем диапазон для Google Calendar в UTC-формате
+const startUTC = toGCalUTC(dateISO, startHHMM);
+const endUTC   = toGCalUTC(dateISO, endHHMM);
 
-// собираем ссылку
-const gcalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE` +
-  `&text=${encodeURIComponent('Университет Мышления – встреча')}` +
-  `&dates=${startStr}/${endStr}` +
-  `&details=${encodeURIComponent('Ваша запись подтверждена')}`;
+const gcalUrl =
+  `https://calendar.google.com/calendar/render?action=TEMPLATE` +
+  `&text=${encodeURIComponent('Университет Мышления — встреча')}` +
+  `&dates=${startUTC}/${endUTC}` +
+  `&details=${encodeURIComponent('Ваша запись подтверждена.')}`;
 
-// показываем пользователю
-if (confirm('Слот забронирован! Хотите добавить в Google Календарь?')) {
+if (confirm('Слот забронирован! Добавить в Google Календарь?')) {
   window.open(gcalUrl, '_blank');
 }
+
+// Обновим слоты месяца и UI
+await loadAndRenderMonth();
+if (window.Telegram && Telegram.WebApp) Telegram.WebApp.close();
 
     // Обновим данные месяца, чтобы слот пропал из "free"
     await loadAndRenderMonth();
