@@ -221,7 +221,28 @@ form.addEventListener('submit', async (e) => {
 
   try {
     await bookSelected(detail, fd.get('name'), fd.get('phone'));
-    alert('Слот забронирован!');
+
+// генерируем дату/время для Google Calendar
+const date = new Date(`${detail.date}T${detail.start}`);  // detail.start = "HH:MM"
+const end = new Date(`${detail.date}T${detail.end}`);     // detail.end = "HH:MM"
+
+// преобразуем в формат YYYYMMDDTHHmmssZ (UTC)
+function toCalFormat(d) {
+  return d.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+}
+const startStr = toCalFormat(date);
+const endStr = toCalFormat(end);
+
+// собираем ссылку
+const gcalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE` +
+  `&text=${encodeURIComponent('Университет Мышления – встреча')}` +
+  `&dates=${startStr}/${endStr}` +
+  `&details=${encodeURIComponent('Ваша запись подтверждена')}`;
+
+// показываем пользователю
+if (confirm('Слот забронирован! Хотите добавить в Google Календарь?')) {
+  window.open(gcalUrl, '_blank');
+}
 
     // Обновим данные месяца, чтобы слот пропал из "free"
     await loadAndRenderMonth();
