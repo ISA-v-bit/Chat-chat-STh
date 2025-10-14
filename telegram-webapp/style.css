@@ -47,4 +47,69 @@ body { margin:0; font:16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, sans-
 @media (max-width: 520px) {
   .values .cards { grid-template-columns: 1fr; }
 }
+ /* ===== Календарь (не зависит от Tailwind) ===== */
+#calendarGrid{
+  display:grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+}
+
+.cal-blank{
+  height: 40px;
+}
+
+.cal-day{
+  height: 40px;
+  border: 1px solid #e6e6ef;
+  border-radius: 10px;
+  background: #fff;
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  transition: transform .12s ease, box-shadow .12s ease, background .12s ease, border-color .12s ease;
+}
+.cal-day:hover{
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(0,0,0,.06);
+}
+
+/* день с доступными слотами */
+.cal-day.has-slots{
+  border-color: var(--brand-pink);
+  background: rgba(240,31,96,0.06);
+}
+.cal-day.has-slots::after{
+  content: "";
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--brand-pink);
+  position: absolute;
+  right: 8px; bottom: 8px;
+  opacity: .9;
+}
+
+/* выбранный день */
+.cal-day.selected{
+  background: var(--brand-pink);
+  border-color: var(--brand-pink);
+  color: #fff;
+  font-weight: 600;
+  box-shadow: 0 8px 24px rgba(240,31,96,.25);
+}
+
+/* сетка времени — страховка, если Tailwind классы не применятся */
+#times{
+  display:grid;
+  grid-template-columns: repeat(3, minmax(0,1fr));
+  gap:12px;
+}
+#times button{
+  height:auto;
+  min-height: 42px;
+}
 }
