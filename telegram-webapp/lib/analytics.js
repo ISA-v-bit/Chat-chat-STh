@@ -1,14 +1,10 @@
-export function getTelegramData() {
-  const tg = window?.Telegram?.WebApp;
-  if (!tg) return { ready: false };
-  try { tg.ready(); tg.expand?.(); } catch {}
-  const d = tg.initDataUnsafe || {};
+export function parseUTM(fb = {}) {
+  const qs = new URLSearchParams(location.search);
+  const get = k => qs.get(k) ?? fb[k] ?? '';
   return {
-    ready: true,
-    userId: d?.user?.id,
-    username: d?.user?.username,
-    language: d?.user?.language_code,
-    chatInstance: d?.chat_instance,
-    themeParams: tg.themeParams || {}
+    utm_source: get('utm_source'),
+    utm_medium: get('utm_medium'),
+    utm_campaign: get('utm_campaign'),
+    utm_content: get('utm_content'),
   };
 }
