@@ -87,49 +87,44 @@ const Booking = (() => {
 
   // ------ Рендер ------
   function renderCalendar(){
-    monthLabel.textContent = `${monthNames[viewMonth]} ${viewYear}`;
+  monthLabel.textContent = `${monthNames[viewMonth]} ${viewYear}`;
 
-    const first = new Date(viewYear, viewMonth, 1);
-    const firstWeekday = (first.getDay() + 6) % 7; // 0=Пн ... 6=Вс
-    const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+  const first = new Date(viewYear, viewMonth, 1);
+  const firstWeekday = (first.getDay() + 6) % 7; // 0=Пн ... 6=Вс
+  const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
 
-    calendarGrid.innerHTML = '';
+  calendarGrid.innerHTML = '';
 
-    for (let i = 0; i < firstWeekday; i++){
-      const blank = document.createElement('div');
-      calendarGrid.appendChild(blank);
-    }
-
-    for (let d = 1; d <= daysInMonth; d++){
-      const iso = toISO(viewYear, viewMonth, d);
-      const hasSlots = Boolean(window.SLOTS_BY_DATE[iso]?.length);
-
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.textContent = d;
-      btn.className = `
-        h-10 rounded-lg border text-sm
-        ${hasSlots
-          ? 'border-brandPink text-brandDark bg-brandPink/10 hover:bg-brandPink/20'
-          : 'border-brandDark/20 text-brandDark/50 cursor-default'}
-      `;
-      if (!hasSlots) btn.disabled = true;
-
-      if (selectedDate === iso) {
-        btn.className = 'h-10 rounded-lg text-white bg-brandPink border border-brandPink font-semibold';
-      }
-
-      btn.onclick = () => {
-        selectedDate = iso;
-        selectedTime = null;
-        renderCalendar();
-        renderTimes();
-        syncFormState();
-      };
-
-      calendarGrid.appendChild(btn);
-    }
+  // пустые ячейки до первого дня
+  for (let i = 0; i < firstWeekday; i++){
+    const blank = document.createElement('div');
+    blank.className = 'cal-blank';
+    calendarGrid.appendChild(blank);
   }
+
+  // дни месяца (всегда показываем)
+  for (let d = 1; d <= daysInMonth; d++){
+    const iso = toISO(viewYear, viewMonth, d);
+    const hasSlots = Boolean(window.SLOTS_BY_DATE[iso]?.length);
+
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.textContent = d;
+    btn.className = 'cal-day';
+    if (hasSlots) btn.classList.add('has-slots');
+    if (selectedDate === iso) btn.classList.add('selected');
+
+    btn.onclick = () => {
+      selectedDate = iso;
+      selectedTime = null;
+      renderCalendar();  // обновим выделение
+      renderTimes();     // перерисуем слоты времени
+      syncFormState();
+    };
+
+    calendarGrid.appendChild(btn);
+  }
+}
 
   function renderTimes(){
     timesGrid.innerHTML = '';
