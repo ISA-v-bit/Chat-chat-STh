@@ -3,91 +3,204 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Запись</title>
+  <title>Клуб Мышления — запись на встречу</title>
 
-  <!-- 1) Сначала CDN Tailwind -->
+  <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- 2) Потом config (иначе "tailwind is not defined") -->
+  <!-- Tailwind config -->
   <script>
     tailwind.config = {
       theme: {
         extend: {
           colors: {
             brandDark: '#263940',
-            brandPink: '#F01F60'
-          }
+            brandPink: '#F01F60',
+            brandBg: '#F7F8FB'
+          },
+          borderRadius: { 'xl2': '16px' }
         }
       }
     }
   </script>
+
+  <style>
+    html { scroll-behavior: smooth; }
+  </style>
+
+  <!-- (опц.) Передай сюда URL скрипта Гугл-таблицы -->
+  <script>
+    window.ENV = window.ENV || {
+      APP_SCRIPT_URL: '' // например: 'https://script.google.com/macros/s/XXXX/exec'
+    };
+  </script>
 </head>
-<body class="bg-gradient-to-br from-brandDark/5 to-white min-h-screen flex items-center justify-center font-sans">
-  <div class="w-full max-w-md bg-white rounded-2xl shadow-lg p-6 border border-brandDark/10">
-   <!-- Логотип -->
-<div class="flex justify-center mb-4">
-  <img
-    src="assets/logo.jpg"
-    alt="Университет Мышления — логотип"
-    width="160"
-    height="160"
-    loading="eager"
-    class="w-28 h-auto rounded-none object-contain select-none"
-  />
-</div>
-    <h1 class="text-2xl font-bold text-center text-brandDark mb-2">
-      Университет <span class="text-brandPink">Мышления</span>
-    </h1>
-    <p class="text-center text-sm text-brandDark/70 mb-6">Выберите дату и время</p>
 
-    <!-- КАЛЕНДАРЬ -->
-    <div class="mb-4">
-      <div class="flex items-center justify-between mb-3">
-        <button id="prevMonth" class="px-3 py-1 rounded-lg border border-brandDark/20 hover:bg-brandDark/5">&larr;</button>
-        <div id="monthLabel" class="font-semibold text-brandDark"></div>
-        <button id="nextMonth" class="px-3 py-1 rounded-lg border border-brandDark/20 hover:bg-brandDark/5">&rarr;</button>
-      </div>
+<body class="bg-brandBg text-brandDark font-sans">
+  <!-- Telegram WebApp init (без ошибок в обычном браузере) -->
+  <script>
+    (function initTG() {
+      const tg = window?.Telegram?.WebApp;
+      if (!tg) return;
+      try { tg.ready(); tg.expand && tg.expand(); } catch(e) {}
+    })();
+  </script>
 
-      <!-- заголовки дней -->
-      <div class="grid grid-cols-7 text-xs text-brandDark/70 mb-1">
-        <div class="text-center py-1">Пн</div><div class="text-center py-1">Вт</div><div class="text-center py-1">Ср</div>
-        <div class="text-center py-1">Чт</div><div class="text-center py-1">Пт</div><div class="text-center py-1">Сб</div><div class="text-center py-1">Вс</div>
-      </div>
-
-      <!-- сетка дат -->
-      <div id="calendarGrid" class="grid grid-cols-7 gap-2"></div>
+  <!-- =================== HEADER =================== -->
+  <header class="sticky top-0 z-40 bg-white/80 backdrop-blur border-b border-black/5">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+      <a href="#" class="flex items-center gap-3">
+        <img src="assets/logo.jpg" alt="Клуб Мышления" class="w-8 h-8 rounded object-cover" />
+        <span class="font-semibold">Клуб Мышления</span>
+      </a>
+      <nav class="hidden sm:flex items-center gap-6 text-sm">
+        <a href="#about" class="text-black/70 hover:text-black">О клубе</a>
+        <a href="#values" class="text-black/70 hover:text-black">Формат</a>
+        <a href="#apply" class="text-white bg-brandPink px-4 py-2 rounded-xl shadow hover:bg-brandDark transition">Записаться</a>
+      </nav>
     </div>
+  </header>
 
-    <!-- ВРЕМЯ (3 в ряд) -->
-    <div>
-      <h2 id="selectedDateLabel" class="text-sm font-medium text-brandDark/80 mb-2 hidden"></h2>
-      <div id="times" class="grid grid-cols-3 gap-3 mb-6"></div>
+  <!-- =================== HERO =================== -->
+  <section class="bg-gradient-to-br from-brandDark/[0.06] to-white">
+    <div class="max-w-6xl mx-auto px-4 py-12 grid md:grid-cols-2 gap-8 items-center">
+      <div>
+        <h1 class="text-3xl sm:text-4xl font-bold mb-3">
+          Клуб Мышления
+        </h1>
+        <p class="text-black/70 mb-6">
+          Прокачивай инструменты мышления и повышай свою эффективность в жизни и бизнесе
+        </p>
+        <a href="#apply"
+           class="inline-flex items-center justify-center bg-brandPink text-white px-5 py-3 rounded-xl shadow hover:bg-brandDark transition">
+          Записаться на встречу
+        </a>
+      </div>
+      <div class="flex justify-center md:justify-end">
+        <img src="assets/logo.jpg" alt="Mind Universe" class="w-56 h-56 object-contain rounded-xl2 shadow-md" />
+      </div>
     </div>
+  </section>
 
-    <!-- ФОРМА -->
-    <form id="form" class="space-y-4">
-      <input type="hidden" name="date" />
-      <input type="hidden" name="time" />
-      <div>
-        <label class="block text-sm font-medium text-brandDark mb-1">Ваше имя</label>
-        <input type="text" name="name" required
-          class="w-full px-3 py-2 border border-brandDark/30 rounded-lg shadow-sm
-                 focus:ring-2 focus:ring-brandPink focus:border-brandPink outline-none" />
-      </div>
-      <div>
-        <label class="block text-sm font-medium text-brandDark mb-1">Телефон</label>
-        <input type="tel" name="phone" required
-          class="w-full px-3 py-2 border border-brandDark/30 rounded-lg shadow-sm
-                 focus:ring-2 focus:ring-brandPink focus:border-brandPink outline-none" />
-      </div>
-      <button type="submit"
-        class="w-full bg-brandPink text-white py-3 rounded-lg font-semibold
-               hover:bg-brandDark transition duration-200 shadow-md disabled:opacity-50 disabled:cursor-not-allowed">
-        Подтвердить запись
-      </button>
-    </form>
-  </div>
+  <!-- =================== ABOUT =================== -->
+  <section id="about" class="max-w-6xl mx-auto px-4 py-10">
+    <h2 class="text-2xl font-semibold mb-2">
+      Клуб мышления — это клуб решения управленческих кейсов
+    </h2>
+    <p class="text-black/70">
+      Тренируй инструменты мышления, решай кейсы и разбирай свои в компании управленцев со всей России.
+    </p>
+  </section>
 
-  <script src="script.js?v=11" defer></script>
+  <!-- =================== VALUES =================== -->
+  <section id="values" class="max-w-6xl mx-auto px-4 pb-10">
+    <h3 class="text-xl font-semibold mb-4">Что такое Клуб мышления?</h3>
+    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <article class="bg-white rounded-2xl p-4 shadow-sm border border-black/5 hover:shadow transition">
+        <h4 class="font-semibold mb-1">Освоение инструментов мышления</h4>
+        <p class="text-black/70 text-sm">
+          Регулярная практика нестандартного мышления как долгосрочного конкурентного преимущества, изменение шаблонов и установок.
+        </p>
+      </article>
+      <article class="bg-white rounded-2xl p-4 shadow-sm border border-black/5 hover:shadow transition">
+        <h4 class="font-semibold mb-1">Сообщество</h4>
+        <p class="text-black/70 text-sm">
+          Практика в компании управленцев и менеджеров с разным бэкграундом. Получи экспертизу от рынка и адаптируй под свои задачи.
+        </p>
+      </article>
+      <article class="bg-white rounded-2xl p-4 shadow-sm border border-black/5 hover:shadow transition">
+        <h4 class="font-semibold mb-1">Кастомизация и уникальность</h4>
+        <p class="text-black/70 text-sm">
+          Мы подберём кейс под ваши интересы и разберём ваш кейс.
+        </p>
+      </article>
+      <article class="bg-white rounded-2xl p-4 shadow-sm border border-black/5 hover:shadow transition">
+        <h4 class="font-semibold mb-1">Формат встреч</h4>
+        <p class="text-black/70 text-sm">
+          Еженедельные встречи в группах до 6 человек.
+        </p>
+      </article>
+    </div>
+  </section>
+
+  <!-- =================== APPLY (твоя текущая форма с календарём) =================== -->
+  <section id="apply" class="max-w-6xl mx-auto px-4 pb-16">
+    <div class="mx-auto max-w-md bg-white rounded-2xl shadow-lg p-6 border border-black/5">
+      <!-- Логотип -->
+      <div class="flex justify-center mb-4">
+        <img
+          src="assets/logo.jpg"
+          alt="Университет Мышления — логотип"
+          width="160" height="160" loading="eager"
+          class="w-28 h-auto object-contain select-none"
+        />
+      </div>
+
+      <h2 class="text-2xl font-bold text-center mb-2">
+        Университет <span class="text-brandPink">Мышления</span>
+      </h2>
+      <p class="text-center text-sm text-black/70 mb-6">Выберите дату и время</p>
+
+      <!-- Календарь -->
+      <div class="mb-4">
+        <div class="flex items-center justify-between mb-3">
+          <button id="prevMonth" class="px-3 py-1 rounded-lg border border-black/10 hover:bg-black/5">&larr;</button>
+          <div id="monthLabel" class="font-semibold"></div>
+          <button id="nextMonth" class="px-3 py-1 rounded-lg border border-black/10 hover:bg-black/5">&rarr;</button>
+        </div>
+        <div class="grid grid-cols-7 text-xs text-black/70 mb-1">
+          <div class="text-center py-1">Пн</div><div class="text-center py-1">Вт</div><div class="text-center py-1">Ср</div>
+          <div class="text-center py-1">Чт</div><div class="text-center py-1">Пт</div><div class="text-center py-1">Сб</div><div class="text-center py-1">Вс</div>
+        </div>
+        <div id="calendarGrid" class="grid grid-cols-7 gap-2"></div>
+      </div>
+
+      <!-- Время -->
+      <div>
+        <h3 id="selectedDateLabel" class="text-sm font-medium text-black/80 mb-2 hidden"></h3>
+        <div id="times" class="grid grid-cols-3 gap-3 mb-6"></div>
+      </div>
+
+      <!-- Форма -->
+      <form id="form" class="space-y-4">
+        <input type="hidden" name="date" />
+        <input type="hidden" name="time" />
+
+        <div>
+          <label class="block text-sm font-medium mb-1">Ваше имя</label>
+          <input type="text" name="name" required
+                 class="w-full px-3 py-2 border border-black/20 rounded-lg shadow-sm
+                        focus:ring-2 focus:ring-brandPink focus:border-brandPink outline-none" />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium mb-1">Телефон</label>
+          <input type="tel" name="phone" required
+                 class="w-full px-3 py-2 border border-black/20 rounded-lg shadow-sm
+                        focus:ring-2 focus:ring-brandPink focus:border-brandPink outline-none" />
+        </div>
+
+        <button type="submit"
+                class="w-full bg-brandPink text-white py-3 rounded-lg font-semibold
+                       hover:bg-brandDark transition duration-200 shadow-md disabled:opacity-50 disabled:cursor-not-allowed">
+          Подтвердить запись
+        </button>
+      </form>
+    </div>
+  </section>
+
+  <!-- =================== FINAL CTA =================== -->
+  <section class="bg-white border-t border-black/5">
+    <div class="max-w-6xl mx-auto px-4 py-10 text-center">
+      <h3 class="text-xl font-semibold mb-3">Готов прокачать мышление?</h3>
+      <a href="#apply"
+         class="inline-flex items-center justify-center bg-brandPink text-white px-5 py-3 rounded-xl shadow hover:bg-brandDark transition">
+        Записаться на встречу
+      </a>
+    </div>
+  </section>
+
+  <!-- Весь JS проекта -->
+  <script src="script.js?v=12" defer></script>
 </body>
 </html>
